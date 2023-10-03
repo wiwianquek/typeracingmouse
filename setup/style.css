@@ -28,6 +28,14 @@ body {
     font-weight: bold;
 }
 
+.level {
+    position: absolute;
+    left: 2rem;
+    font-size: 3rem;
+    color: yellow;
+    font-weight: bold;
+}
+
 .wpm {
     position: absolute;
     top: 2rem;
@@ -64,14 +72,13 @@ body {
 }
 
 .cat {
-    position: center;
-    top: 180px; /* Adjust as needed */
+    position: absolute;
+    top: 180px; 
     font-size: 24px;
 }
 
 .mouse {
-    position: center;
-    top: 250px; /* Adjust as needed */
+    position: absolute;
+    top: 250px; 
     font-size: 24px;
 }
-
