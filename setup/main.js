@@ -7,16 +7,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const levelDisplay = document.querySelector('.level'); // Get the level display element
     const catElement = document.querySelector('.cat');
     const mouseElement = document.querySelector('.mouse');
-    let correct = false;
     let startTime = 0;
     let currentLevel = 0; // Initialize the current level to 1
-
-    // Function to check if the timer has reached 0 and render a new quote
-    function checkTimer() {
-        if (parseInt(timer.innerText) === 0) {
-            endGame(); // End the game when the timer reaches 0
-        }
-    }
+    let mouseAnimationFrame;  // Declare this to keep track of the mouse's animation frame
+    let totalTime = 60; //Set initial time at 60 seconds
 
     // Function to fetch the API quotes
     async function getRandomQuote() {
@@ -35,12 +29,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Function to clear the quote
-    function clearQuoteDisplay() {
-        quoteDisplay.innerText = '';
-    }
-
-    // Renders the quote in the quote-display
     function renderQuote(quote) {
         quote.split('').forEach(alphabet => {
             const alphabetSpan = document.createElement('span');
@@ -50,55 +38,94 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+     // Function to clear the quote
+     function clearQuoteDisplay() {
+        quoteDisplay.innerText = '';
+        quoteInput.value = '';
+    }
+
+    // Function to restart the game
+    function restartGame() {
+        gameEnded = false; //resets the 'gameEnded' flag to false so that the game doesn't end prematurely 
+        mouseElement.style.left = '0px';
+        catElement.style.left = '0px';
+        currentLevel = 0;
+        startTime = Date.now();
+        levelDisplay.innerText = `Level: ${currentLevel}`;
+        wpmElement.innerText = '0 WPM';  // Reset WPM display
+        renderNewQuote();
+    }
+    
+    // Function to end the game
+    let gameEnded = false;
+
+    function endGame(reason) {
+        console.log("endGame called due to:", reason);
+        if (gameEnded) return; // Prevent multiple calls
+
+        gameEnded = true;
+
+        // Cancel both cat and mouse animation frames
+        if (mouseAnimationFrame) {
+            cancelAnimationFrame(mouseAnimationFrame);
+        }
+
+        const restart = confirm('Game Over! Do you want to restart the game?');
+        if (restart) {
+            restartGame();
+        } else {
+            // To display end game leaderboard or other actions
+        }
+        console.log("endGame called");
+    }
+
+     // Function to check if the timer has reached 0 and render a new quote
+     function checkTimer() {
+        if (parseInt(timer.innerText) === 0) {
+            endGame("timer hit zero"); // End the game when the timer reaches 0
+        }
+    }
+    
+    //Function to add a timer 
     let timerInterval; // Declare timerInterval outside the function scope
 
     function startTimer() {
-        let remainingTime = 60;
 
         // Check if there's an existing timer interval and clear it
         if (timerInterval) {
             clearInterval(timerInterval);
         }
 
-        function updateTimer() {
-            timer.innerText = remainingTime;
-            remainingTime--;
+        let counter = 0
 
-            if (remainingTime < 0) {
+        function updateTimer() {
+            counter++;
+            if (counter === 10) {
+                totalTime--;
+                timer.innerText = totalTime;
+                counter = 0;
+            }
+
+            //Function to move the cat
+            const screenWidth = window.innerWidth;
+            const totalWidth = screenWidth - 100; // Adjust for cat width
+            const levelTime = Math.max(10, 70 - (currentLevel * 10)) * 10;
+
+            const distance = (levelTime - (totalTime * 10) + counter) / levelTime * totalWidth;
+            // console.log(levelTime, totalTime, counter, distance);
+            catElement.style.left = `${distance}px`;
+
+            if (totalTime < 0) {
                 clearInterval(timerInterval);
                 timer.innerText = '0';
-                endGame(); // End the game when the timer reaches 0
+                endGame("timer hit zerooo"); // End the game when the timer reaches 0
             }
         }
 
-        updateTimer();
-        timerInterval = setInterval(updateTimer, 1000);
+        timerInterval = setInterval(updateTimer, 100);
+        
     }
 
-    // Function to restart the game
-    function restartGame() {
-        currentLevel = 0;
-        levelDisplay.innerText = `Level: ${currentLevel}`;
-        clearQuoteDisplay();
-        quoteInput.value = '';
-        startTimer();
-        correct = true;
-        renderNewQuote();
-        catSpeed = 30; // Reset cat speed
-        moveCat(); // Restart the cat animation
-        moveMouse(); // Restart the mouse animation
-    }
-
-    // Function to end the game
-    function endGame() {
-        // Display a message or ask if the player wants to restart
-        const restart = confirm('Game Over! Do you want to restart the game?');
-        if (restart) {
-            restartGame(); // Restart the game if the player chooses to
-        } else {
-            // To display end game leader
-        }
-    }
 
     // Function to calculate WPM
     function calculateWPM() {
@@ -108,175 +135,27 @@ document.addEventListener('DOMContentLoaded', function () {
             window.wpm = 0;
             wpmElement.innerText = '0 WPM';
         } else {
-            const elapsedTimeMinutes = (currentTime - startTime) / 60000; // Convert milliseconds to minutes
+            const elapsedTimeMinutes = Math.max(0.01, (currentTime - startTime) / 60000); // Convert milliseconds to minutes
             const wordCount = quoteInput.value.trim().split(/\s+/).length;
     
             window.wpm = Math.round(wordCount / elapsedTimeMinutes);
             wpmElement.innerText = `${window.wpm} WPM`;
         }
     }
-
-    // Inside the renderNewQuote function, after generating a new quote, update the level
-    async function renderNewQuote() {
-        clearQuoteDisplay();
-        const quote = await getRandomQuote();
-        renderQuote(quote);
-        startTimer();
-        correct = true;
-        quoteInput.value = '';
-        startTime = Date.now(); // Set startTime here to prevent infinity time
-        calculateWPM(); // Calculate WPM here to update the global wpm variable
-
-        // Increase the current level and update the levelDisplay
-        currentLevel++;
-        levelDisplay.innerText = `Level: ${currentLevel}`;
-
-         // Reset cat and mouse positions when a new quote is displayed
-        catElement.style.left = '0px';
-        mouseElement.style.left = '0px';
-
-        // Restart the cat and mouse animations
-        moveCat();
-        moveMouse();
-    }
-
-    // function moveMouse() {
-    //     const quoteText = quoteDisplay.textContent.replace(/\s+/g, ''); // Remove spaces from displayed quote
-    //     const typedText = quoteInput.value.trim();
-        
-    //     // Calculate the total length of the quote
-    //     const totalLength = quoteText.length;
-    
-    //     // Get the screen width
-    //     const screenWidth = window.innerWidth;
-    
-    //     // Calculate the distance based on the length of the generated quote
-    //     const distance = screenWidth - 20; // Adjust based on screen size
-    
-    //     // Calculate the remaining characters to be typed
-    //     const remainingCharacters = totalLength - typedText.length;
-    
-    //     // Calculate the distance the mouse should travel
-    //     const mouseDistance = distance * (1 - remainingCharacters / totalLength);
-    
-    //     // Update mouse animation
-    //     mouseElement.style.transition = 'none'; // Clear any existing transition
-    
-    //     // Calculate the number of correct characters typed
-    //     let correctCharacters = 0;
-    //     for (let i = 0; i < typedText.length; i++) {
-    //         if (typedText[i] === quoteText[i]) {
-    //             correctCharacters++;
-    //         } else {
-    //             break; // Stop counting when an incorrect character is encountered
-    //         }
-    //     }
-    
-    //     // Calculate the new mouse position based on correct characters
-    //     const newMouseDistance = (correctCharacters / totalLength) * distance;
-    
-    //     // Ensure the mouse position doesn't go beyond the screen width
-    //     const clampedMousePosition = Math.min(newMouseDistance, screenWidth - 20);
-    
-    //     if (correctCharacters === typedText.length) {
-    //         // All characters are correct, move the mouse
-    //         mouseElement.style.left = clampedMousePosition + 'px';
-    //     } else {
-    //         // Incorrect character, keep the mouse at the current position
-    //         mouseElement.style.left = Math.min(mouseDistance, screenWidth - 20) + 'px';
-    //     }
-    
-    //     // Use requestAnimationFrame for smooth animation
-    //     requestAnimationFrame(moveMouse);
-    // }
     
 
-    //     // Function to move the cat based on the timer and level
-    // function moveCat() {
-    //     const distance = window.innerWidth - 100; // Adjust based on screen size
-    //     const remainingTime = parseInt(timer.innerText);
-
-    //     // Calculate the catSpeed based on the remaining time and level
-    //     const baseCatSpeed = 30; // Initial cat speed
-    //     const levelCatSpeedIncrement = 10; // Speed increment per level
-    //     const catSpeed = baseCatSpeed + (currentLevel - 1) * levelCatSpeedIncrement;
-
-    //     // Calculate the duration based on catSpeed
-    //     const duration = (distance / catSpeed) * 1000;
-
-    //     // Update cat animation
-    //     catElement.style.transition = `left ${duration / 1000}s linear`;
-
-    //     // Check if the cat should move or if the timer has run out
-    //     if (remainingTime > 0) {
-    //         // Update cat's position
-    //         catElement.style.left = '0px'; // Move cat to the left edge
-
-    //         // Use setTimeout to continue moving the cat
-    //         setTimeout(() => {
-    //             moveCat();
-    //         }, duration);
-    //     }
-    // }
-
-    // Function to move the cat based on the timer and level
-    function moveCat() {
-        const distance = window.innerWidth - 100; // Adjust based on screen size
-        const remainingTime = parseInt(timer.innerText);
-
-        // Calculate the catSpeed based on the remaining time and level
-        const baseCatSpeed = 30; // Initial cat speed
-        const levelCatSpeedIncrement = 10; // Speed increment per level
-        const catSpeed = baseCatSpeed + (currentLevel - 1) * levelCatSpeedIncrement;
-
-        // Calculate the duration based on catSpeed
-        const duration = (distance / catSpeed) * 1000;
-
-        // Check if the cat should move or if the timer has run out
-        if (remainingTime > 0) {
-            // Update cat animation
-            catElement.style.transition = `left ${duration / 1000}s linear`;
-
-            // Set the initial cat position
-            let catPosition = 0;
-
-            // Move the cat using an interval
-            const interval = setInterval(() => {
-                // Update the cat's left position
-                catElement.style.left = catPosition + 'px';
-
-                // Increment the position
-                catPosition += 10; // You can adjust the increment for the desired speed
-
-                if (catPosition >= distance) {
-                    // Stop the interval when the cat reaches the end
-                    clearInterval(interval);
-                }
-            }, duration / distance); // Adjust the interval speed based on the duration and distance
-        }
-    }
-
-
-    
-
+    //Function to move the mouse
     function moveMouse() {
-        const quoteText = quoteDisplay.textContent.replace(/\s+/g, ''); // Remove spaces from displayed quote
-        const typedText = quoteInput.value.trim();
+        if (gameEnded) return;  // Don't continue updating the mouse if the game ended
+
+        const quoteText = quoteDisplay.textContent
+        const typedText = quoteInput.value
     
         // Calculate the total length of the quote
         const totalLength = quoteText.length;
-    
-        // Get the screen width
-        const screenWidth = window.innerWidth;
-    
+       
         // Calculate the distance based on the length of the generated quote
-        const distance = screenWidth - 20; // Adjust based on screen size
-    
-        // Calculate the remaining characters to be typed
-        const remainingCharacters = totalLength - typedText.length;
-    
-        // Calculate the distance the mouse should travel
-        const mouseDistance = distance * (1 - remainingCharacters / totalLength);
+        const distance = document.querySelector('.content-wrapper').clientWidth - 50; // Adjust based on screen size
     
         // Update mouse animation
         mouseElement.style.transition = 'none'; // Clear any existing transition
@@ -294,23 +173,50 @@ document.addEventListener('DOMContentLoaded', function () {
         // Calculate the new mouse position based on correct characters
         const newMouseDistance = (correctCharacters / totalLength) * distance;
     
-        // Ensure the mouse position doesn't go beyond the screen width
-        const clampedMousePosition = Math.min(newMouseDistance, screenWidth - 20);
-    
-        if (correctCharacters === typedText.length) {
-            // All characters are correct, move the mouse
-            mouseElement.style.left = clampedMousePosition + 'px';
-        } else {
-            // Incorrect character, keep the mouse at the current position
-            mouseElement.style.left = Math.min(mouseDistance, screenWidth - 20) + 'px';
-        }
-    
+       
+         // Incorrect character, keep the mouse at the current position
+        mouseElement.style.left = Math.min(newMouseDistance, distance) + 'px';
+        
+
         // Use requestAnimationFrame for smooth animation
-        requestAnimationFrame(moveMouse);
+        mouseAnimationFrame = requestAnimationFrame(moveMouse);
     }
     
+    
+    //Function to render a new Quote
+    async function renderNewQuote() {
+        // Cancel mouse animation frames
+        if (mouseAnimationFrame) {
+            cancelAnimationFrame(mouseAnimationFrame);
+        }
 
-
+        // Reset cat and mouse positions after canceling their animation frames
+        catElement.style.left = '0px';
+        mouseElement.style.left = '0px';
+        mouseElement.offsetHeight;  // Force a reflow
+        
+        // Reset the start time here
+        startTime = Date.now();
+        
+        //Clear my quote display and render new quote 
+        clearQuoteDisplay();
+        const quote = await getRandomQuote();
+        renderQuote(quote);
+        startTimer();
+        
+    
+        // Start the movement for both cat and mouse
+        lastTimestamp = null;
+        moveMouse();
+    
+        calculateWPM();
+        
+    
+        // // Increase the current level and update the levelDisplay
+        currentLevel++;
+        totalTime = Math.max(10, 70 - (currentLevel * 10));
+        levelDisplay.innerText = `Level: ${currentLevel}`;
+    }
     
 
     // Add an event listener whenever something is typed in the quote-input section
@@ -336,17 +242,15 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-        // Check if all characters are correct and the user has completed typing accurately
         if (allCorrect && arrayValue.length === arrayQuote.length) {
-            renderNewQuote(); // Generate a new quote
+            clearQuoteDisplay();  // Clear the quote
+            renderNewQuote();  // Fetch and display a new quote
         }
-         // Start moving the cat and mouse initially
-        moveCat();
-        moveMouse();
-
-        checkTimer(); // Check the timer after each input
-        checkRaceEnd(); // Check the race end condition
+    
+        checkTimer();
     });
 
     renderNewQuote(); // Initial quote rendering
 });
+
+///
