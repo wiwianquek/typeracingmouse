@@ -1,5 +1,5 @@
-# Typing Racing Mouse
-Welcome to the Typing Racing Mouse Game! Challenge yourself with dynamic typing test and not letting the cat reach the finish line first!
+# Type Racing Mouse
+Welcome to the Typing Racing Mouse Game! 
 
 [Figma Design](https://www.figma.com/file/MEq6Phdkyy3dceOgdBrlEn/Type-Racing-Mouse?type=whiteboard&node-id=0%3A1&t=ZBKBAXBA1guzeqs7-1) - Check out my game design/logic here! 
 
@@ -23,7 +23,7 @@ This game fetches random quotes from the Quotable API and tasks the player with 
 2. Start typing the quote in the input box as quickly and accurately as you can.
 3. If you finish typing the quote correctly, you'll proceed to the next level.
 4. Be fast! The cat is chasing after you, and with each level, its speed increases.
-5. The game ends if you don't complete typing before the timer runs out or if the cat catches you.
+5. The game ends if you don't complete typing before the timer runs out or if the cat reaches the finish line first! 
 
 *This game is developed using vanilla JavaScript, CSS, and HTML. The quotes are fetched dynamically from the Quotable API.*
 
