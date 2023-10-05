@@ -129,15 +129,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Function to calculate WPM
     function calculateWPM() {
-        const currentTime = Date.now();
+        const currentTime = Date.now(); //gets the current time in milliseconds 
 
+        //if quote has no input, wpm stays at 0 
         if (!quoteInput.value) {
             window.wpm = 0;
             wpmElement.innerText = '0 WPM';
+
         } else {
-            const elapsedTimeMinutes = Math.max(0.01, (currentTime - startTime) / 60000); // Convert milliseconds to minutes
+            //(currentTime - startTime) / 60000 = how many minutes have passed since user started typing 
+            // 0.01 to make sure that the time won't go to 0 which will screw up the math (becomes unrealistically high WPM)
+            const elapsedTimeMinutes = Math.max(0.01, (currentTime - startTime) / 60000);
+            
+            //trim the white spaces at the beginning or end of the string, this helps to avoid false counts e.g. if someone accidentally hit the space bar at the end of the sentence
+            //split into array of words, where:
+                // \s: This matches any white space character (like spaces, tabs, and line breaks)
+                // +: ensures that it matches one or more consecutive white spaces
+                // so  /\s+/ helps to handle scenarios where there might be multiple spaces between words or tabs, and treat all the spaces as a single delimiter 
+            //.length to calc the count of words 
             const wordCount = quoteInput.value.trim().split(/\s+/).length;
-    
+            
+            //Calculates WPM by dividing the number of words by the time taken in minutes, then rounds it to the nearest whole number
             window.wpm = Math.round(wordCount / elapsedTimeMinutes);
             wpmElement.innerText = `${window.wpm} WPM`;
         }
