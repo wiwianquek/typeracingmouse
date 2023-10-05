@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentLevel = 0; // Initialize the current level to 1
     let mouseAnimationFrame;  // Declare this to keep track of the mouse's animation frame
     let totalTime = 60; //Set initial time at 60 seconds
+    
 
     // Function to fetch the API quotes
     async function getRandomQuote() {
@@ -32,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function renderQuote(quote) {
         quote.split('').forEach(alphabet => {
             const alphabetSpan = document.createElement('span');
-            alphabetSpan.classList.add('correct');
+            alphabetSpan.classList.add('incorrect');
             alphabetSpan.innerText = alphabet;
             quoteDisplay.appendChild(alphabetSpan);
         });
@@ -76,6 +77,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             // To display end game leaderboard or other actions
         }
+
         console.log("endGame called");
     }
 
@@ -155,7 +157,12 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
     
-
+    //Function to display highest WPM
+    function displayBestWPM() {
+        const bestWPM = localStorage.getItem('bestWPM') || 0;
+        document.querySelector('.best-wpm').innerText = bestWPM;
+    }
+    
     //Function to move the mouse
     function moveMouse() {
         if (gameEnded) return;  // Don't continue updating the mouse if the game ended
@@ -187,6 +194,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
        
          // Incorrect character, keep the mouse at the current position
+         // ensures that even if newMouseDistance suggests moving the mouse further to the right, it won't go beyond the distance value
         mouseElement.style.left = Math.min(newMouseDistance, distance) + 'px';
         
 
@@ -265,4 +273,4 @@ document.addEventListener('DOMContentLoaded', function () {
     renderNewQuote(); // Initial quote rendering
 });
 
-///
+
