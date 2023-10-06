@@ -2,6 +2,7 @@
 Welcome to the Typing Racing Mouse Game! 
 
 [Figma Design](https://www.figma.com/file/MEq6Phdkyy3dceOgdBrlEn/Type-Racing-Mouse?type=whiteboard&node-id=0%3A1&t=ZBKBAXBA1guzeqs7-1) - Check out my game design/logic here! 
+[Play The Game!](https://wiwianquek.github.io/typeracingmouse/typeracingmouse) - Click to Play! 
 
 
 ## Overview
