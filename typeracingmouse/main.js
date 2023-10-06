@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const RANDOM_QUOTE_API_URL = 'http://api.quotable.io/random';
+    const RANDOM_QUOTE_API_URL = 'https://api.quotable.io/random';
     const quoteDisplay = document.querySelector('.quote-display');
     const quoteInput = document.querySelector('.quote-input');
     const timer = document.querySelector('.timer');
@@ -16,26 +16,25 @@ document.addEventListener('DOMContentLoaded', function () {
     // Function to fetch the API quotes
     async function getRandomQuote() {
         try {
-            let res = await fetch(RANDOM_QUOTE_API_URL);
-            if (res.status === 200) {
+            let res = await fetch(RANDOM_QUOTE_API_URL); // fetch a random quote from a given API
+            if (res.status === 200) { //if the fetch is successful and the server response is OK (status 200), it returns the fetched quote
                 let data = await res.json();
-                let quote = data['content'];
+                let quote = data['content']; //get from the 'content' of the quote (can open the json file to see)
                 return quote;
             } else {
                 throw new Error('Failed to fetch a random quote');
             }
         } catch (error) {
-            console.error(error);
             return '';
         }
     }
-
+    
     function renderQuote(quote) {
-        quote.split('').forEach(alphabet => {
+        quote.split('').forEach(alphabet => { //split each character and registers as it's own 'alphabet' in the new html span 
             const alphabetSpan = document.createElement('span');
-            alphabetSpan.classList.add('incorrect');
-            alphabetSpan.innerText = alphabet;
-            quoteDisplay.appendChild(alphabetSpan);
+            alphabetSpan.classList.add('incorrect'); //for css styling (so can see if type correctly or not per character)
+            alphabetSpan.innerText = alphabet; // sets the span's inner text to the character
+            quoteDisplay.appendChild(alphabetSpan); //appends the span to the quoteDisplay element, displaying the quote character by character
         });
     }
 
@@ -98,12 +97,12 @@ document.addEventListener('DOMContentLoaded', function () {
             clearInterval(timerInterval);
         }
 
-        let counter = 0
+        let counter = 0 //initialize a counter to 0 
 
-        function updateTimer() {
+        function updateTimer() { //sub-timer 
             counter++;
-            if (counter === 10) {
-                totalTime--;
+            if (counter === 10) { //100 milliseconds 
+                totalTime--; //for every 20 calls, it will reduce the timer by one second
                 timer.innerText = totalTime;
                 counter = 0;
             }
@@ -111,19 +110,24 @@ document.addEventListener('DOMContentLoaded', function () {
             //Function to move the cat
             const screenWidth = window.innerWidth;
             const totalWidth = screenWidth - 100; // Adjust for cat width
-            const levelTime = Math.max(10, 70 - (currentLevel * 10)) * 10;
+            const levelTime = Math.max(10, 70 - (currentLevel * 10)) * 10; //Calculates the timer based on level. Timer will decrease at every increase of level, but it won't go below 10 seconds
 
-            const distance = (levelTime - (totalTime * 10) + counter) / levelTime * totalWidth;
-            // console.log(levelTime, totalTime, counter, distance);
-            catElement.style.left = `${distance}px`;
+            //totalTime = remaining time in seconds
+
+
+            const distance = (levelTime - (totalTime * 10) + counter) / levelTime * totalWidth;  
+            //calculates the amount of time that has elapsed since the start of the current level, in tenths of a second. 
+            //Then multiply by 'totalWidth' to scale the fraction to the total distance the cat can move on the screen. So e.g. if half the level time passed, then the cat will be halfway in the screen
+    
+            catElement.style.left = `${distance}px`; //it calculates how far the "cat" should move on the screen based on the remaining time and current level
 
             if (totalTime < 0) {
                 clearInterval(timerInterval);
                 timer.innerText = '0';
-                endGame("timer hit zerooo"); // End the game when the timer reaches 0
+                endGame("timer hit zerooooo"); // End the game when the timer reaches 0
             }
         }
-
+        //starts a timer that calls the updateTimer function every 0.1 seconds, and the returned ID for this timer is stored in the timerInterval variable
         timerInterval = setInterval(updateTimer, 100);
         
     }
@@ -155,12 +159,6 @@ document.addEventListener('DOMContentLoaded', function () {
             window.wpm = Math.round(wordCount / elapsedTimeMinutes);
             wpmElement.innerText = `${window.wpm} WPM`;
         }
-    }
-    
-    //Function to display highest WPM
-    function displayBestWPM() {
-        const bestWPM = localStorage.getItem('bestWPM') || 0;
-        document.querySelector('.best-wpm').innerText = bestWPM;
     }
     
     //Function to move the mouse
@@ -267,7 +265,7 @@ document.addEventListener('DOMContentLoaded', function () {
             renderNewQuote();  // Fetch and display a new quote
         }
     
-        checkTimer();
+        checkTimer(); //triggers my endgame 
     });
 
     renderNewQuote(); // Initial quote rendering
