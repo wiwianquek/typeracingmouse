@@ -107,7 +107,7 @@ One function I would like to share about is the math behind my ``startTimer`` fu
 
     }
 
-```
+- ```updatetimer```: Acts as a sub-function for the timer, where for every 10 calls, it will reduce the timer by one second using the counter.
 
 - ```levelTime```: This is the total duration for the current level in tenths of a second.
 
