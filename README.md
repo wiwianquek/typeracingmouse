@@ -65,6 +65,87 @@ Note that Mouse doesn't move if a wrong character is typed, and mouse moves back
 
 https://github.com/wiwianquek/typeracingmouse/assets/136752154/40c3f369-3d62-43aa-8631-2c9f953d8773
 
+### Challenging Function
+
+One function I would like to share about is the math behind my ``startTimer`` function, or basically the **moving cat** function:
+
+```
+    let timerInterval; 
+
+    function startTimer() {
+
+        if (timerInterval) {
+            clearInterval(timerInterval);
+        }
+
+        let counter = 0 
+
+        function updateTimer() { 
+            counter++;
+            if (counter === 10) { 
+                totalTime--;
+                timer.innerText = totalTime;
+                counter = 0;
+            }
+
+            const screenWidth = window.innerWidth;
+            const totalWidth = screenWidth - 100; 
+            const levelTime = Math.max(10, 70 - (currentLevel * 10)) * 10; 
+
+            const distance = (levelTime - (totalTime * 10) + counter) / levelTime * totalWidth;  
+            
+            catElement.style.left = `${distance}px`; 
+
+               if (totalTime < 0) {
+                clearInterval(timerInterval);
+                timer.innerText = '0';
+                endGame("timer hit zerooooo"); 
+            }
+        }
+
+        timerInterval = setInterval(updateTimer, 100);
+
+    }
+
+```
+
+- ```levelTime```: This is the total duration for the current level in tenths of a second.
+
+- ```totalTime * 10```: Converts the remaining seconds (totalTime) into tenths of a second.
+
+- ```levelTime - (totalTime * 10) + counter```: This calculates the elapsed time since the start of the current level, in tenths of a second. counter adds the additional tenths of a second passed since the last full second.
+
+- ```(levelTime - (totalTime * 10) + counter) / levelTime```: This produces a fraction representing the proportion of time that has elapsed for the current level.
+
+- ```... * totalWidth```: The fraction from the above step is multiplied by the total possible movement distance (totalWidth) of the cat on the screen.
+
+### For Example:
+- The screen width (screenWidth) is 1100 pixels.
+- The cat has a width of 100 pixels.
+- So, ```totalWidth``` (possible movement distance for the cat) = 1100 - 100 = **1000** pixels.
+
+Next, let's say currentLevel is 3: 
+- ```levelTime``` = Math.max(10, 70 - (3 * 10)) * 10 = **500** (meaning 50 seconds, but since we're dealing in tenths of a second, it's 500).
+- Let's say totalTime is 40 seconds into the level (meaning 10 seconds have passed), and counter is 5 (meaning 0.5 seconds more has passed, so a total of 10.5 seconds).
+
+Then we calculate the distance:
+
+```
+distance = (500 - (40 * 10) + 5) / 500 * 1000
+         = (500 - 400 + 5) / 500 * 1000
+         = 105 / 500 * 1000
+         = 0.21 * 1000
+         = 210 pixels
+```
+
+<img width="843" alt="Level3_Calculation" src="https://github.com/wiwianquek/typeracingmouse/assets/136752154/01b34cc8-9601-454d-b496-dd85a90adbab">
+
+
+As depicted above, after 10.5 seconds in Level 3, the cat would have moved approximately 210 pixels to the right on the screen. 
+
+So in conclusion, for every ```levelTime``` and ```totalTime``` recorded, there is a calculated ```distance``` where the cat will be positioned at, leading into the "animation" of the cat. 
+
+
 ### Improvements
 - Include a leaderboard where it records the highest WPM
 - Improve the timer display (currently there's a lag to display the next level time) 
