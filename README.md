@@ -42,13 +42,14 @@ Following shows the game logic flow.
 
 1. Quote will be rendered in the ```quote display```
 2. User needs to type within the ```quote input```
-3. Mouse will move based on the following calculations:
-     - **Distance**: The distance is based on the length of the generated quote (since each quote length is different), adjusted to the screenwidth/size
-     - **Moving Mouse (Speed)**: Mouse moves based on the number of correct characters typed over the length of quote, adjusted to the screenwidth/size
+3. Mouse will move based on the following calculations in ```moveMouse``` function:
+     - **Distance**: The distance is based on the length of the generated quote (since each quote length is different), adjusted to the screenwidth/size.
+     - **Moving Mouse (Speed)**: Mouse moves based on the number of correct characters typed over the length of quote, adjusted to the screenwidth/size.
   
-4. Cat will move based on the following calculations:
-   - **Distance**: The distance is based on the total time based on the level, adjusted to the screenwidth/size
-   - **Moving Cat (Speed)**: Cat moves based on the timer (or as the seconds reduces), adjusted to the screenwidth/size 
+4. Cat will move based on the following calculations, within my ``startTimer`` function:
+   - **Distance**: The distance is based on the total time based on the level, adjusted to the screenwidth/size.
+   - **Moving Cat (Speed)**: Cat moves based on the timer (or as the seconds reduces), adjusted to the screenwidth/size.
+   - Note that the cat logic here is tied to the end of the timer, where basically ```timer === 0```  is equal to ```cat reaching the end```
   
 5. If mouse reaches the end first, it moves to the new level where:
    - Level increases by 1
@@ -56,7 +57,7 @@ Following shows the game logic flow.
    - Cat becomes faster
    - Timer resets
 
-6. If cat reaches the end, the game ends and prompts a restart. Note that the cat logic here is tied to the end of the timer, where basically ```timer === 0```  is equal to ```cat reaching the end```! 
+6. If cat reaches the end, the game ends and prompts a restart. 
 
 ### Cool Features
 
@@ -66,7 +67,7 @@ https://github.com/wiwianquek/typeracingmouse/assets/136752154/40c3f369-3d62-43a
 
 ### Improvements
 - Include a leaderboard where it records the highest WPM
-- Improve the timer display (there's a lag to display the next level time) 
+- Improve the timer display (currently there's a lag to display the next level time) 
 - Improve the animation flow for the cat
 - Optimize the UI/UX of the game 
    
